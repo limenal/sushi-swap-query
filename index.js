@@ -1,8 +1,8 @@
-import {getDaysInfo} from './pairs.js'
+import {getPairsDaysInfo, getPairsHoursInfo} from './pairs.js'
 
 async function main()
 {
-    const pairDays = await getDaysInfo(1615232988, 200)
+    const pairDays = await getPairsHoursInfo(1615232988, 24)
     
     for(let i = 0; i < pairDays.length; ++i)
     {
