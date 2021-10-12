@@ -1,29 +1,60 @@
 import axios from 'axios'
 
-export async function getPairsDaysInfo(startTimestamp, days)
-{
+// Available 
+// DAI-WETH
+// DAI-FRAX
+// OHM - DAI
+// 
 
-    let query = `
-    {	
-        pairYears(first: 1 where:{id:"OHM-DAI2021pair"}){
-          dayPair(first:365, orderBy:timestamp)
-          {
-                token1Price
-                token1PriceLow
-                token1PriceOpen
-                token1PriceHigh
-                timestamp
-                volumeToken0In
-                volumeToken0Out
-                volumeToken1In
-                volumeToken1Out
-            }
-        }
-      }
+export async function getPairsDaysInfo(startTimestamp, days, year, token0, token1)
+{
+  let findPairQuery = 
+  `{
+    pairs(where:{name_in:["${token0}-` + `${token1}"]})
+    {
+      id
+    }
+  }
+  `
     
-    `
     try
     {
+      const findPair = await axios({
+        url: 'https://api.thegraph.com/subgraphs/name/limenal/sushi-swap-ohm',
+        method: 'post',
+        data: {
+          query: findPairQuery
+        }
+      })
+      let id = findPair.data.data.pairs[0].id
+      let pairName
+      if(id !== undefined)
+      {
+        pairName = token0 + '-' + token1
+      }
+      else
+      {
+        pairName = token1 + '-' + token0
+      }
+      let query = `
+      {	
+          pairYears(first: 1 where:{id:"${pairName}` + `${year}pair"}){
+            dayPair(first:365, orderBy:timestamp)
+            {
+                  token1Price
+                  token1PriceLow
+                  token1PriceOpen
+                  token1PriceHigh
+                  timestamp
+                  volumeToken0In
+                  volumeToken0Out
+                  volumeToken1In
+                  volumeToken1Out
+              }
+          }
+        }
+      
+      `
       const pairData = await axios({
           url: 'https://api.thegraph.com/subgraphs/name/limenal/sushi-swap-ohm',
           method: 'post',
@@ -47,7 +78,6 @@ export async function getPairsDaysInfo(startTimestamp, days)
           pairs.push(obj)
       }
       let prevPriceClose
-
       for(let i = 0; i < days-1; ++i)
       {
         let beginTimestamp = startTimestamp + i * 86400
@@ -86,6 +116,7 @@ export async function getPairsDaysInfo(startTimestamp, days)
         }
         data.push(obj)
       }
+      
       return data
     }
     catch(err)
@@ -94,31 +125,59 @@ export async function getPairsDaysInfo(startTimestamp, days)
     }
 }
 
-export async function getPairsHoursInfo(startTimestamp, days)
+export async function getPairsHoursInfo(startTimestamp, days, year, token0, token1)
 {
-  let query = `
-  {	
-    pairYears(first: 1 where:{id:"OHM-DAI2021pair"}){
-      dayPair(first:365, orderBy:timestamp)
-      {
-        hourPair(first:24 orderBy:timestamp)
-        {
-          token1Price
-          token1PriceLow
-          token1PriceOpen
-          token1PriceHigh
-          timestamp
-          volumeToken0In
-          volumeToken0Out
-          volumeToken1In
-          volumeToken1Out
-        }
-      }
+  let findPairQuery = 
+  `{
+    pairs(where:{name_in:["${token0}-` + `${token1}"]})
+    {
+      id
     }
   }
   `
+
+  
   try
   {
+    const findPair = await axios({
+      url: 'https://api.thegraph.com/subgraphs/name/limenal/sushi-swap-ohm',
+      method: 'post',
+      data: {
+        query: findPairQuery
+      }
+    })
+    let id = findPair.data.data.pairs[0].id
+    let pairName
+    if(id !== undefined)
+    {
+      pairName = token0 + '-' + token1
+    }
+    else
+    {
+      pairName = token1 + '-' + token0
+    }
+    let query = `
+    {	
+      pairYears(first: 1 where:{id:"${pairName}` + `${year}pair"}){
+        dayPair(first:365, orderBy:timestamp)
+        {
+          hourPair(first:24 orderBy:timestamp)
+          {
+            token1Price
+            token1PriceLow
+            token1PriceOpen
+            token1PriceHigh
+            timestamp
+            volumeToken0In
+            volumeToken0Out
+            volumeToken1In
+            volumeToken1Out
+          }
+        }
+      }
+    }
+    `
+
     const pairData = await axios({
       url: 'https://api.thegraph.com/subgraphs/name/limenal/sushi-swap-ohm',
       method: 'post',
@@ -192,11 +251,41 @@ export async function getPairsHoursInfo(startTimestamp, days)
   }
 }
 
-export async function getPairsMinuteInfo(startTimestamp, days)
+export async function getPairsMinuteInfo(startTimestamp, days, year, token0, token1)
 {
-  let query = `
+  let findPairQuery = 
+  `{
+    pairs(where:{name_in:["${token0}-` + `${token1}"]})
+    {
+      id
+    }
+  }
+  `
+
+  
+  try
+  {
+    const findPair = await axios({
+      url: 'https://api.thegraph.com/subgraphs/name/limenal/sushi-swap-ohm',
+      method: 'post',
+      data: {
+        query: findPairQuery
+      }
+    })
+    let id = findPair.data.data.pairs[0].id
+    let pairName
+    if(id !== undefined)
+    {
+      pairName = token0 + '-' + token1
+    }
+    else
+    {
+      pairName = token1 + '-' + token0
+    }
+
+    let query = `
   {	
-    pairYears(first: 1 where:{id:"OHM-DAI2021pair"}){
+    pairYears(first: 1 where:{id:"${pairName}` + `${year}pair"}){
       dayPair(first:365, orderBy:timestamp)
       {
         hourPair(first:24 orderBy:timestamp)
@@ -218,8 +307,7 @@ export async function getPairsMinuteInfo(startTimestamp, days)
     }
   }
   `
-  try
-  {
+  
     const pairData = await axios({
       url: 'https://api.thegraph.com/subgraphs/name/limenal/sushi-swap-ohm',
       method: 'post',
