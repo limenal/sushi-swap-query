@@ -1,10 +1,10 @@
 import axios from 'axios'
 
-// Available 
-// DAI-WETH
-// DAI-FRAX
-// OHM - DAI
-// 
+/**
+
+    * @dev : Get stakes (days)
+
+*/
 
 export async function getPairsDaysInfo(startTimestamp, days, year, token0, token1)
 {
@@ -105,13 +105,6 @@ export async function getPairsDaysInfo(startTimestamp, days, year, token0, token
             obj.token1PriceLow = pairs[j].token1PriceLow
             obj.volumeToken1In = pairs[j].volumeToken1In
             obj.volumeToken1Out = pairs[j].volumeToken1Out
-          }
-          else
-          {
-            if(!!prevPriceClose)
-            {
-              obj.token1PriceOpen = prevPriceClose
-            }
           }
         }
         data.push(obj)
@@ -227,19 +220,12 @@ export async function getPairsHoursInfo(startTimestamp, days, year, token0, toke
           {
             obj.token1PriceOpen = pairs[j].token1PriceOpen
             obj.token1PriceClose = pairs[j].token1PriceClose
-            prevPriceClose = pairs[j].token1PriceClose
             obj.token1PriceHigh = pairs[j].token1PriceHigh
             obj.token1PriceLow = pairs[j].token1PriceLow
             obj.volumeToken1In = pairs[j].volumeToken1In
             obj.volumeToken1Out = pairs[j].volumeToken1Out
           }
-          else
-          {
-            if(!!prevPriceClose)
-            {
-              obj.token1PriceOpen = prevPriceClose
-            }
-          }
+          
         }
         data.push(obj)
     }
@@ -307,7 +293,7 @@ export async function getPairsMinuteInfo(startTimestamp, days, year, token0, tok
     }
   }
   `
-  
+
     const pairData = await axios({
       url: 'https://api.thegraph.com/subgraphs/name/limenal/sushi-swap-ohm',
       method: 'post',
@@ -360,19 +346,12 @@ export async function getPairsMinuteInfo(startTimestamp, days, year, token0, tok
           {
             obj.token1PriceOpen = pairs[j].token1PriceOpen
             obj.token1PriceClose = pairs[j].token1PriceClose
-            prevPriceClose = pairs[j].token1PriceClose
             obj.token1PriceHigh = pairs[j].token1PriceHigh
             obj.token1PriceLow = pairs[j].token1PriceLow
             obj.volumeToken1In = pairs[j].volumeToken1In
             obj.volumeToken1Out = pairs[j].volumeToken1Out
           }
-          else
-          {
-            if(!!prevPriceClose)
-            {
-              obj.token1PriceOpen = prevPriceClose
-            }
-          }
+          
         }
         data.push(obj)
     }
@@ -380,6 +359,6 @@ export async function getPairsMinuteInfo(startTimestamp, days, year, token0, tok
   }
   catch(err)
   {
-
+    console.log(err)
   }
 }
