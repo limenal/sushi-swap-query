@@ -1,5 +1,5 @@
 import axios from 'axios'
-
+import fs from 'fs'
 /**
 
     * @dev : Get stakes (days)
@@ -38,7 +38,7 @@ export async function getPairsDaysInfo(startTimestamp, days, year, token0, token
       }
       let query = `
       {	
-          pairYears(first: 3 where:{name:"${pairName}"}){
+          pairYears(first: 1 where:{id:"${pairName}` + `${year}pair"}){
             dayPair(first:365, orderBy:timestamp)
             {
                   token1Price
@@ -63,6 +63,7 @@ export async function getPairsDaysInfo(startTimestamp, days, year, token0, token
           }
       }) 
       const pair = pairData.data.data.pairYears
+      console.log(query)
       let data = []
       let pairs = []
       for(let c = 0; c < pair.length; ++c)
@@ -80,7 +81,6 @@ export async function getPairsDaysInfo(startTimestamp, days, year, token0, token
             pairs.push(obj)
         }
       }
-      
       for(let i = 0; i < days-1; ++i)
       {
         let beginTimestamp = startTimestamp + i * 86400
@@ -332,52 +332,66 @@ export async function getPairsMinuteInfo(startTimestamp, days, year, token0, tok
     // {
     let beginTimestamp = startTimestamp
     let endTimestamp = startTimestamp + 60
+    let startIndexingTimestamp = 0
     for(let j = 0; j < pairs.length; ++j)
+    {
+      if(beginTimestamp <= pairs[j].timestamp && pairs[j].timestamp < endTimestamp)
       {
         let obj = {
           beginTimestamp: beginTimestamp,
           endTimestamp: endTimestamp,
-          token1PriceOpen: 0,
-          token1PriceClose: 0,
-          token1PriceHigh: 0,
-          token1PriceLow: 0,
-          volumeToken1In: 0,
-          volumeToken1Out: 0,
+          token1PriceOpen: pairs[j].token1PriceOpen,
+          token1PriceClose: pairs[j].token1PriceClose,
+          token1PriceHigh: pairs[j].token1PriceHigh,
+          token1PriceLow: pairs[j].token1PriceLow,
+          volumeToken1In: pairs[j].volumeToken1In,
+          volumeToken1Out: pairs[j].volumeToken1Out,
+          timestamp: pairs[j].timestamp
         }
-        if(pairs[j].timestamp > endTimestamp)
+        
+        beginTimestamp += 60
+        endTimestamp += 60
+
+        if(startIndexingTimestamp === 0)
         {
-          let c = 1
-          while(endTimestamp < pairs[j].timestamp)
-          {
-            obj = {
-              beginTimestamp: beginTimestamp,
-              endTimestamp: endTimestamp,
-              token1PriceOpen: 0,
-              token1PriceClose: 0,
-              token1PriceHigh: 0,
-              token1PriceLow: 0,
-              volumeToken1In: 0,
-              volumeToken1Out: 0,
-            }
-            beginTimestamp = beginTimestamp + (c * 60)
-            endTimestamp = endTimestamp + ((c+1) * 60)
-            data.push(obj)
-            ++c
+          startIndexingTimestamp = pairs[j].timestamp
+        }
+        data.push(obj)  
+      }
+      else if(startIndexingTimestamp !== 0)
+      {
+        while(!(beginTimestamp <= pairs[j].timestamp && pairs[j].timestamp < endTimestamp))
+        {
+          let obj = {
+            beginTimestamp: beginTimestamp,
+            endTimestamp: endTimestamp,
+            token1PriceOpen: 0,
+            token1PriceClose: 0,
+            token1PriceHigh: 0,
+            token1PriceLow: 0,
+            volumeToken1In: 0,
+            volumeToken1Out:0,
           }
-          obj.beginTimestamp = beginTimestamp
-          obj.endTimestamp = endTimestamp
-          obj.token1PriceOpen = pairs[j].token1PriceOpen
-          obj.token1PriceClose = pairs[j].token1PriceClose
-          obj.token1PriceHigh = pairs[j].token1PriceHigh
-          obj.token1PriceLow = pairs[j].token1PriceLow
-          obj.volumeToken1In = pairs[j].volumeToken1In
-          obj.volumeToken1Out = pairs[j].volumeToken1Out
-          obj.timestamp = pairs[j].timestamp
           data.push(obj)
+          beginTimestamp += 60
+          endTimestamp += 60
+        }
+        let objTmp = {
+          beginTimestamp: beginTimestamp,
+          endTimestamp: endTimestamp,
+          token1PriceOpen: pairs[j].token1PriceOpen,
+          token1PriceClose: pairs[j].token1PriceClose,
+          token1PriceHigh: pairs[j].token1PriceHigh,
+          token1PriceLow: pairs[j].token1PriceLow,
+          volumeToken1In: pairs[j].volumeToken1In,
+          volumeToken1Out: pairs[j].volumeToken1Out,
+          timestamp: pairs[j].timestamp
         }
         beginTimestamp += 60
         endTimestamp += 60
+        data.push(objTmp)
       }
+    }
       // data.push(obj)
     // }
     return data;
