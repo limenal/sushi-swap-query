@@ -38,7 +38,7 @@ export async function getPairsDaysInfo(startTimestamp, days, year, token0, token
       }
       let query = `
       {	
-          pairYears(first: 1 where:{id:"${pairName}` + `${year}pair"}){
+          pairYears(first: 100 where:{id:"${pairName}` + `${year}pair"}){
             dayPair(first:365, orderBy:timestamp)
             {
                   token1Price
@@ -65,19 +65,22 @@ export async function getPairsDaysInfo(startTimestamp, days, year, token0, token
       const pair = pairData.data.data.pairYears
       let data = []
       let pairs = []
-      for(let i = 0; i < pair[0].dayPair.length; ++i)
+      for(let c = 0; c < pair.length; ++c)
       {
-          let obj = {}
-          obj.token1PriceClose = pair[0].dayPair[i].token1Price
-          obj.token1PriceLow = pair[0].dayPair[i].token1PriceLow
-          obj.token1PriceOpen = pair[0].dayPair[i].token1PriceOpen
-          obj.token1PriceHigh = pair[0].dayPair[i].token1PriceHigh
-          obj.timestamp = pair[0].dayPair[i].timestamp
-          obj.volumeToken1In = pair[0].dayPair[i].volumeToken1In
-          obj.volumeToken1Out = pair[0].dayPair[i].volumeToken1Out
-          pairs.push(obj)
+        for(let i = 0; i < pair[c].dayPair.length; ++i)
+        {
+            let obj = {}
+            obj.token1PriceClose = pair[c].dayPair[i].token1Price
+            obj.token1PriceLow = pair[c].dayPair[i].token1PriceLow
+            obj.token1PriceOpen = pair[c].dayPair[i].token1PriceOpen
+            obj.token1PriceHigh = pair[c].dayPair[i].token1PriceHigh
+            obj.timestamp = pair[c].dayPair[i].timestamp
+            obj.volumeToken1In = pair[c].dayPair[i].volumeToken1In
+            obj.volumeToken1Out = pair[c].dayPair[i].volumeToken1Out
+            pairs.push(obj)
+        }
       }
-      let prevPriceClose
+      
       for(let i = 0; i < days-1; ++i)
       {
         let beginTimestamp = startTimestamp + i * 86400
@@ -100,7 +103,6 @@ export async function getPairsDaysInfo(startTimestamp, days, year, token0, token
           {
             obj.token1PriceOpen = pairs[j].token1PriceOpen
             obj.token1PriceClose = pairs[j].token1PriceClose
-            prevPriceClose = pairs[j].token1PriceClose
             obj.token1PriceHigh = pairs[j].token1PriceHigh
             obj.token1PriceLow = pairs[j].token1PriceLow
             obj.volumeToken1In = pairs[j].volumeToken1In
@@ -181,24 +183,24 @@ export async function getPairsHoursInfo(startTimestamp, days, year, token0, toke
     const pair = pairData.data.data.pairYears
     let data = []
     let pairs = []
-    for(let i = 0; i < pair[0].dayPair.length; ++i)
+    for(let c = 0; c < pair.length; ++c)
     {
-      for(let j = 0; j < pair[0].dayPair[i].hourPair.length; ++j)
+      for(let i = 0; i < pair[c].dayPair.length; ++i)
       {
-        let obj = {}
-        obj.token1PriceClose = pair[0].dayPair[i].hourPair[j].token1Price
-        obj.token1PriceLow = pair[0].dayPair[i].hourPair[j].token1PriceLow
-        obj.token1PriceOpen = pair[0].dayPair[i].hourPair[j].token1PriceOpen
-        obj.token1PriceHigh = pair[0].dayPair[i].hourPair[j].token1PriceHigh
-        obj.timestamp = pair[0].dayPair[i].hourPair[j].timestamp
-        obj.volumeToken1In = pair[0].dayPair[i].hourPair[j].volumeToken1In
-        obj.volumeToken1Out = pair[0].dayPair[i].hourPair[j].volumeToken1Out
-        pairs.push(obj)
+        for(let j = 0; j < pair[c].dayPair[i].hourPair.length; ++j)
+        {
+          let obj = {}
+          obj.token1PriceClose = pair[c].dayPair[i].hourPair[j].token1Price
+          obj.token1PriceLow = pair[c].dayPair[i].hourPair[j].token1PriceLow
+          obj.token1PriceOpen = pair[c].dayPair[i].hourPair[j].token1PriceOpen
+          obj.token1PriceHigh = pair[c].dayPair[i].hourPair[j].token1PriceHigh
+          obj.timestamp = pair[c].dayPair[i].hourPair[j].timestamp
+          obj.volumeToken1In = pair[c].dayPair[i].hourPair[j].volumeToken1In
+          obj.volumeToken1Out = pair[c].dayPair[i].hourPair[j].volumeToken1Out
+          pairs.push(obj)
+        }
       }
     }
-
-    let prevPriceClose
-
     for(let i = 0; i < 24*days; ++i)
     {
       let beginTimestamp = startTimestamp + i * 3600
@@ -304,27 +306,28 @@ export async function getPairsMinuteInfo(startTimestamp, days, year, token0, tok
     const pair = pairData.data.data.pairYears
     let data = []
     let pairs = []
-    for(let i = 0; i < pair[0].dayPair.length; ++i)
+    for(let c = 0; c < pair.length; ++c)
     {
-      for(let j = 0; j < pair[0].dayPair[i].hourPair.length; ++j)
+      for(let i = 0; i < pair[c].dayPair.length; ++i)
       {
-        for(let c = 0; c < pair[0].dayPair[i].hourPair[j].minutePair.length; ++c)
+        for(let j = 0; j < pair[c].dayPair[i].hourPair.length; ++j)
         {
-          let obj = {}
-          obj.token1PriceClose = pair[0].dayPair[i].hourPair[j].minutePair[c].token1Price
-          obj.token1PriceLow = pair[0].dayPair[i].hourPair[j].minutePair[c].token1PriceLow
-          obj.token1PriceOpen = pair[0].dayPair[i].hourPair[j].minutePair[c].token1PriceOpen
-          obj.token1PriceHigh = pair[0].dayPair[i].hourPair[j].minutePair[c].token1PriceHigh
-          obj.timestamp = pair[0].dayPair[i].hourPair[j].minutePair[c].timestamp
-          obj.volumeToken1In = pair[0].dayPair[i].hourPair[j].minutePair[c].volumeToken1In
-          obj.volumeToken1Out = pair[0].dayPair[i].hourPair[j].minutePair[c].volumeToken1Out
-          pairs.push(obj)
-  
+          for(let c = 0; c < pair[c].dayPair[i].hourPair[j].minutePair.length; ++c)
+          {
+            let obj = {}
+            obj.token1PriceClose = pair[c].dayPair[i].hourPair[j].minutePair[c].token1Price
+            obj.token1PriceLow = pair[c].dayPair[i].hourPair[j].minutePair[c].token1PriceLow
+            obj.token1PriceOpen = pair[c].dayPair[i].hourPair[j].minutePair[c].token1PriceOpen
+            obj.token1PriceHigh = pair[c].dayPair[i].hourPair[j].minutePair[c].token1PriceHigh
+            obj.timestamp = pair[c].dayPair[i].hourPair[j].minutePair[c].timestamp
+            obj.volumeToken1In = pair[c].dayPair[i].hourPair[j].minutePair[c].volumeToken1In
+            obj.volumeToken1Out = pair[c].dayPair[i].hourPair[j].minutePair[c].volumeToken1Out
+            pairs.push(obj)
+          }
         }
       }
     }
-
-    let prevPriceClose
+  
     for(let i = 0; i < 60*24*days; ++i)
     {
       let beginTimestamp = startTimestamp + i * 60
