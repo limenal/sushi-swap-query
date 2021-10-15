@@ -38,7 +38,7 @@ export async function getPairsDaysInfo(startTimestamp, days, year, token0, token
       }
       let query = `
       {	
-          pairYears(first: 1 where:{id:"${pairName}` + `${year}pair"}){
+          pairYears(first: 5 where:{name:"${pairName}"}){
             dayPair(first:365, orderBy:timestamp)
             {
                   token1Price
@@ -153,7 +153,7 @@ export async function getPairsHoursInfo(startTimestamp, days, year, token0, toke
     }
     let query = `
     {	
-      pairYears(first: 1 where:{id:"${pairName}` + `${year}pair"}){
+      pairYears(first: 5 where:{name:"${pairName}"}){
         dayPair(first:365, orderBy:timestamp)
         {
           hourPair(first:24 orderBy:timestamp)
@@ -274,7 +274,7 @@ export async function getPairsMinuteInfo(startTimestamp, days, year, token0, tok
 
     let query = `
   {	
-    pairYears(first: 1 where:{id:"${pairName}` + `${year}pair"}){
+    pairYears(first: 5 where:{name:"${pairName}"}){
       dayPair(first:365, orderBy:timestamp)
       {
         hourPair(first:24 orderBy:timestamp)
