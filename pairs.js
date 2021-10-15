@@ -120,7 +120,7 @@ export async function getPairsDaysInfo(startTimestamp, days, year, token0, token
     }
 }
 
-export async function getPairsHoursInfo(startTimestamp, days, year, token0, token1)
+export async function getPairsHoursInfo(startTimestamp, days, token0, token1)
 {
   let findPairQuery = 
   `{
@@ -240,7 +240,7 @@ export async function getPairsHoursInfo(startTimestamp, days, year, token0, toke
   }
 }
 
-export async function getPairsMinuteInfo(startTimestamp, days, year, token0, token1)
+export async function getPairsMinuteInfo(startTimestamp, days, token0, token1)
 {
   let findPairQuery = 
   `{
@@ -251,11 +251,10 @@ export async function getPairsMinuteInfo(startTimestamp, days, year, token0, tok
   }
   `
 
-  
   try
   {
     const findPair = await axios({
-      url: 'https://api.thegraph.com/subgraphs/name/limenal/sushi-swap-ohm',
+      url: 'https://api.thegraph.com/subgraphs/id/QmbmwkWCQtWnHFkESGW2zt6GT6yBFLm7N3dnRf5eG8df2W',
       method: 'post',
       data: {
         query: findPairQuery
@@ -298,7 +297,7 @@ export async function getPairsMinuteInfo(startTimestamp, days, year, token0, tok
   `
 
     const pairData = await axios({
-      url: 'https://api.thegraph.com/subgraphs/name/limenal/sushi-swap-ohm',
+      url: 'https://api.thegraph.com/subgraphs/id/QmbmwkWCQtWnHFkESGW2zt6GT6yBFLm7N3dnRf5eG8df2W',
       method: 'post',
       data: {
         query: query
@@ -333,9 +332,14 @@ export async function getPairsMinuteInfo(startTimestamp, days, year, token0, tok
     let beginTimestamp = startTimestamp
     let endTimestamp = startTimestamp + 60
     let startIndexingTimestamp = 0
+    let endTime = startTimestamp + days * 86400
     for(let j = 0; j < pairs.length; ++j)
     {
-      if(beginTimestamp <= pairs[j].timestamp && pairs[j].timestamp < endTimestamp)
+      if(endTimestamp >= endTime)
+      {
+        break;
+      }
+      else if(beginTimestamp <= Number(pairs[j].timestamp) && Number(pairs[j].timestamp) < endTimestamp)
       {
         let obj = {
           beginTimestamp: beginTimestamp,
@@ -358,7 +362,7 @@ export async function getPairsMinuteInfo(startTimestamp, days, year, token0, tok
         }
         data.push(obj)  
       }
-      else if(startIndexingTimestamp !== 0)
+      else
       {
         while(!(beginTimestamp <= pairs[j].timestamp && pairs[j].timestamp < endTimestamp))
         {
@@ -372,7 +376,10 @@ export async function getPairsMinuteInfo(startTimestamp, days, year, token0, tok
             volumeToken1In: 0,
             volumeToken1Out:0,
           }
-          data.push(obj)
+          if(startIndexingTimestamp !== 0)
+          {
+            data.push(obj)
+          }
           beginTimestamp += 60
           endTimestamp += 60
         }

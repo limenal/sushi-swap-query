@@ -2,7 +2,7 @@ import {getPairsDaysInfo, getPairsHoursInfo, getPairsMinuteInfo} from './pairs.j
 
 async function main()
 {
-    const pair = await getPairsMinuteInfo(1634079600, 365, 2021, 'OHM', 'DAI')
+    const pair = await getPairsMinuteInfo(1611914700, 365, 'OHM', 'DAI')
     for(let i = 0; i < pair.length; ++i)
     {
         console.log(pair[i])
