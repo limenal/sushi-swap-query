@@ -1,11 +1,82 @@
 import axios from 'axios'
-import fs from 'fs'
+
+
+export async function getSwaps(startTimestamp, period, numberOfPeriods)
+{
+  let timestamps = []
+  for(let i = 0; i < numberOfPeriods; ++i)
+  {
+    timestamps.push(startTimestamp + i*period)
+  }
+  let query = '{'
+
+  let data = []
+  for(let i = 0; i < timestamps.length - 1; ++i)
+  {
+    query += `
+      t${timestamps[i]}:stakes(first: 1, where:{timestamp_gte: ${timestamps[i]}, timestamp_lt: ${timestamps[i+1]}})
+      {
+        amountStaked
+        timestamp
+      }
+    
+      `
+    if(i % 220 == 0)
+    {
+      console.log(i)
+      // send query then null
+      query+= "}"
+      const stakeData = await axios({
+        url: 'https://api.thegraph.com/subgraphs/name/limenal/olympus-stake',
+        method: 'post',
+        data: {
+          query: query
+        }
+      })
+      let stakes = stakeData.data.data
+      // console.log(stakes)
+      // console.log(Date())
+      console.log(stakes)
+      data.concat(stakes)
+      query = '{'
+    }
+    // else
+    // {
+    //   query += `
+    //   t${timestamps[i]}:stakes(first: 1, where:{timestamp_gte: ${timestamps[i]}, timestamp_lt: ${timestamps[i+1]}})
+    //   {
+    //     amountStaked
+    //     timestamp
+    //   }
+    
+    //   `
+    // }
+  }
+  return data
+  // for(let i = 0; i < timestamps.length - 1; ++i)
+  // {
+  //   query += `
+  //     t${timestamps[i]}:swaps(first: 1, where:{token0:"SUSHI", token1:"WETH", timestamp_gte: ${timestamps[i]}, timestamp_lt: ${timestamps[i+1]}}, orderBy:price, orderDirection:desc)
+  //     {
+  //       price
+  //       amount0In
+  //       amount0Out
+  //     }
+    
+  //   `
+  // }
+  // query += '}'
+  // console.log(pairs)
+  
+}
+
+
+
 /**
 
-    * @dev : Get stakes (days)
+    * @dev : Get pairs (days)
 
 */
-
 export async function getPairsDaysInfo(startTimestamp, days, year, token0, token1)
 {
   let findPairQuery = 
@@ -120,7 +191,7 @@ export async function getPairsDaysInfo(startTimestamp, days, year, token0, token
     }
 }
 
-export async function getPairsHoursInfo(startTimestamp, days, token0, token1)
+export async function getPairsHoursInfo(startTimestamp, endTime, token0, token1)
 {
   let findPairQuery = 
   `{
@@ -154,7 +225,7 @@ export async function getPairsHoursInfo(startTimestamp, days, token0, token1)
     let query = `
     {	
       pairYears(first: 5 where:{name:"${pairName}"}){
-        dayPair(first:365, orderBy:timestamp)
+        dayPair(first:365, orderBy:timestamp where:{timestamp_gte: ${startTimestamp}, timestamp_lte:${endTime} })
         {
           hourPair(first:24 orderBy:timestamp)
           {
@@ -172,7 +243,7 @@ export async function getPairsHoursInfo(startTimestamp, days, token0, token1)
       }
     }
     `
-
+    console.log(Date())
     const pairData = await axios({
       url: 'https://api.thegraph.com/subgraphs/name/limenal/sushi-swap-ohm',
       method: 'post',
@@ -180,6 +251,7 @@ export async function getPairsHoursInfo(startTimestamp, days, token0, token1)
         query: query
       }
     }) 
+    console.log(Date())
     const pair = pairData.data.data.pairYears
     let data = []
     let pairs = []
@@ -201,37 +273,83 @@ export async function getPairsHoursInfo(startTimestamp, days, token0, token1)
         }
       }
     }
-    for(let i = 0; i < 24*days; ++i)
+    let beginTimestamp = startTimestamp
+    let endTimestamp = startTimestamp + 3600
+    let startIndexingTimestamp = 0
+    for(let j = 0; j < pairs.length; ++j)
     {
-      let beginTimestamp = startTimestamp + i * 3600
-      let endTimestamp = startTimestamp + (i+1) * 3600
-      let obj = {
-        beginTimestamp: beginTimestamp,
-        endTimestamp: endTimestamp,
-        token1PriceOpen: 0,
-        token1PriceClose: 0,
-        token1PriceHigh: 0,
-        token1PriceLow: 0,
-        volumeToken1In: 0,
-        volumeToken1Out: 0,
+      if(endTimestamp >= endTime)
+      {
+        break;
       }
-      for(let j = 0; j < pairs.length; ++j)
+      else if(beginTimestamp <= Number(pairs[j].timestamp) && Number(pairs[j].timestamp) <= endTimestamp)
+      {
+        let obj = {
+          beginTimestamp: beginTimestamp,
+          endTimestamp: endTimestamp,
+          token1PriceOpen: pairs[j].token1PriceOpen,
+          token1PriceClose: pairs[j].token1PriceClose,
+          token1PriceHigh: pairs[j].token1PriceHigh,
+          token1PriceLow: pairs[j].token1PriceLow,
+          volumeToken1In: pairs[j].volumeToken1In,
+          volumeToken1Out: pairs[j].volumeToken1Out,
+          timestamp: pairs[j].timestamp
+        }
+        
+        beginTimestamp += 3600
+        endTimestamp += 3600
+
+        if(startIndexingTimestamp === 0)
         {
-          
-          if(beginTimestamp <= pairs[j].timestamp && pairs[j].timestamp < endTimestamp)
+          startIndexingTimestamp = pairs[j].timestamp
+        }
+        data.push(obj)  
+      }
+      else
+      {
+        while(!(beginTimestamp <= Number(pairs[j].timestamp) && Number(pairs[j].timestamp) <= endTimestamp))
+        {
+          if(beginTimestamp >= pairs[j].timestamp)
           {
-            obj.token1PriceOpen = pairs[j].token1PriceOpen
-            obj.token1PriceClose = pairs[j].token1PriceClose
-            obj.token1PriceHigh = pairs[j].token1PriceHigh
-            obj.token1PriceLow = pairs[j].token1PriceLow
-            obj.volumeToken1In = pairs[j].volumeToken1In
-            obj.volumeToken1Out = pairs[j].volumeToken1Out
+            break;
+          }
+          let obj = {
+            beginTimestamp: beginTimestamp,
+            endTimestamp: endTimestamp,
+            token1PriceOpen: 0,
+            token1PriceClose: 0,
+            token1PriceHigh: 0,
+            token1PriceLow: 0,
+            volumeToken1In: 0,
+            volumeToken1Out:0,
           }
           
+          data.push(obj)
+          
+          beginTimestamp += 3600
+          endTimestamp += 3600
         }
-
-        data.push(obj)
+        if(beginTimestamp <= Number(pairs[j].timestamp) && Number(pairs[j].timestamp) <= endTimestamp)
+        {
+          let objTmp = {
+            beginTimestamp: beginTimestamp,
+            endTimestamp: endTimestamp,
+            token1PriceOpen: pairs[j].token1PriceOpen,
+            token1PriceClose: pairs[j].token1PriceClose,
+            token1PriceHigh: pairs[j].token1PriceHigh,
+            token1PriceLow: pairs[j].token1PriceLow,
+            volumeToken1In: pairs[j].volumeToken1In,
+            volumeToken1Out: pairs[j].volumeToken1Out,
+            timestamp: pairs[j].timestamp
+          }
+          beginTimestamp += 3600
+          endTimestamp += 3600
+          
+          data.push(objTmp)  
+        }
+      }
     }
+    console.log(Date())
     return data;
   }
   catch(err)
@@ -240,7 +358,7 @@ export async function getPairsHoursInfo(startTimestamp, days, token0, token1)
   }
 }
 
-export async function getPairsMinuteInfo(startTimestamp, days, token0, token1)
+export async function getPairsMinuteInfo(startTimestamp, endTime, token0, token1)
 {
   let findPairQuery = 
   `{
@@ -273,10 +391,10 @@ export async function getPairsMinuteInfo(startTimestamp, days, token0, token1)
 
     let query = `
   {	
-    pairYears(first: 5 where:{name:"${pairName}"}){
-      dayPair(first:365, orderBy:timestamp)
+    pairYears(first: 1 where:{name:"${pairName}"}){
+      dayPair(first:365, orderBy:timestamp where:{timestamp_gte: ${startTimestamp}, timestamp_lte:${endTime} } )
       {
-        hourPair(first:24 orderBy:timestamp)
+        hourPair(first:24)
         {
           minutePair(first:60 orderBy:timestamp)
           {
@@ -295,7 +413,8 @@ export async function getPairsMinuteInfo(startTimestamp, days, token0, token1)
     }
   }
   `
-
+  
+    console.log(Date())
     const pairData = await axios({
       url: 'https://api.thegraph.com/subgraphs/id/QmbmwkWCQtWnHFkESGW2zt6GT6yBFLm7N3dnRf5eG8df2W',
       method: 'post',
@@ -303,7 +422,10 @@ export async function getPairsMinuteInfo(startTimestamp, days, token0, token1)
         query: query
       }
     })
+    console.log(Date())
+    
     const pair = pairData.data.data.pairYears
+    
     let data = []
     let pairs = []
     for(let c = 0; c < pair.length; ++c)
@@ -327,19 +449,17 @@ export async function getPairsMinuteInfo(startTimestamp, days, token0, token1)
         }
       }
     }
-    // for(let i = 0; i < 60*24*days; ++i)
-    // {
+    // // 
     let beginTimestamp = startTimestamp
     let endTimestamp = startTimestamp + 60
     let startIndexingTimestamp = 0
-    let endTime = startTimestamp + days * 86400
     for(let j = 0; j < pairs.length; ++j)
     {
       if(endTimestamp >= endTime)
       {
         break;
       }
-      else if(beginTimestamp <= Number(pairs[j].timestamp) && Number(pairs[j].timestamp) < endTimestamp)
+      else if(beginTimestamp <= Number(pairs[j].timestamp) && Number(pairs[j].timestamp) <= endTimestamp)
       {
         let obj = {
           beginTimestamp: beginTimestamp,
@@ -364,8 +484,12 @@ export async function getPairsMinuteInfo(startTimestamp, days, token0, token1)
       }
       else
       {
-        while(!(beginTimestamp <= pairs[j].timestamp && pairs[j].timestamp < endTimestamp))
+        while(!(beginTimestamp <= Number(pairs[j].timestamp) && Number(pairs[j].timestamp) <= endTimestamp))
         {
+          if(beginTimestamp >= pairs[j].timestamp)
+          {
+            break;
+          }
           let obj = {
             beginTimestamp: beginTimestamp,
             endTimestamp: endTimestamp,
@@ -376,31 +500,35 @@ export async function getPairsMinuteInfo(startTimestamp, days, token0, token1)
             volumeToken1In: 0,
             volumeToken1Out:0,
           }
-          if(startIndexingTimestamp !== 0)
-          {
-            data.push(obj)
-          }
+          
+          data.push(obj)
+          
           beginTimestamp += 60
           endTimestamp += 60
         }
-        let objTmp = {
-          beginTimestamp: beginTimestamp,
-          endTimestamp: endTimestamp,
-          token1PriceOpen: pairs[j].token1PriceOpen,
-          token1PriceClose: pairs[j].token1PriceClose,
-          token1PriceHigh: pairs[j].token1PriceHigh,
-          token1PriceLow: pairs[j].token1PriceLow,
-          volumeToken1In: pairs[j].volumeToken1In,
-          volumeToken1Out: pairs[j].volumeToken1Out,
-          timestamp: pairs[j].timestamp
+        if(beginTimestamp <= Number(pairs[j].timestamp) && Number(pairs[j].timestamp) <= endTimestamp)
+        {
+          let objTmp = {
+            beginTimestamp: beginTimestamp,
+            endTimestamp: endTimestamp,
+            token1PriceOpen: pairs[j].token1PriceOpen,
+            token1PriceClose: pairs[j].token1PriceClose,
+            token1PriceHigh: pairs[j].token1PriceHigh,
+            token1PriceLow: pairs[j].token1PriceLow,
+            volumeToken1In: pairs[j].volumeToken1In,
+            volumeToken1Out: pairs[j].volumeToken1Out,
+            timestamp: pairs[j].timestamp
+          }
+          beginTimestamp += 60
+          endTimestamp += 60
+          
+          data.push(objTmp)  
         }
-        beginTimestamp += 60
-        endTimestamp += 60
-        data.push(objTmp)
       }
     }
       // data.push(obj)
     // }
+    console.log(Date())
     return data;
   }
   catch(err)
