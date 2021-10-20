@@ -3,7 +3,7 @@ import {getPairsDaysInfo, getPairsHoursInfo, getPairsMinuteInfo} from './pairs.j
 async function main()
 {
     // const pair = await getSwaps(1621390383, 60, 222)
-    let pair = await getPairsDaysInfo(1614556800, 1627776000 , 'OHM', 'DAI')
+    let pair = await getPairsMinuteInfo(1634342400, 1634428800 , 'OHM', 'DAI')
     for(let i = 0; i < pair.length; ++i)
     {
         

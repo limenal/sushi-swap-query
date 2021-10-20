@@ -461,7 +461,7 @@ export async function getPairsMinuteInfo(startTimestamp, endTime, token0, token1
     pairYears(first: 1 where:{name:"${pairName}"}){
       dayPair(first:365, orderBy:timestamp where:{timestamp_gte: ${startTimestamp}, timestamp_lt:${endTime} } )
       {
-        hourPair(first:24)
+        hourPair(first:24 orderBy:timestamp)
         {
           minutePair(first:60 orderBy:timestamp)
           {
