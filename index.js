@@ -1,4 +1,4 @@
-import {getPairsDaysInfo, getPairsHoursInfo, getPairsMinuteInfo} from './pairs.js'
+import {getPairsDaysInfo, getPairsHoursInfo, getPairsMinuteInfo, getPairsNHoursInfo} from './pairs.js'
 
 async function main()
 {
@@ -6,10 +6,7 @@ async function main()
     let pair = await getPairsMinuteInfo(1634342400, 1634428800 , 'OHM', 'DAI')
     for(let i = 0; i < pair.length; ++i)
     {
-        
         console.log(pair[i])
-
-        
     }
     // console.log(pair[pair.length - 1])
     console.log(pair.length)
