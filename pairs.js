@@ -199,8 +199,8 @@ export async function getPairsDaysInfo(startTimestamp, endTime, token0, token1)
               token1PriceClose: prevToken1PriceClose,
               token1PriceHigh: prevToken1PriceHigh,
               token1PriceLow: prevToken1PriceLow,
-              volumeToken1In: prevVolumeToken1In,
-              volumeToken1Out: prevVolumeToken1Out,
+              volumeToken1In: 0,
+              volumeToken1Out: 0,
               }
             
             data.push(obj)
@@ -226,8 +226,6 @@ export async function getPairsDaysInfo(startTimestamp, endTime, token0, token1)
             prevToken1PriceClose = pairs[j].token1PriceClose
             prevToken1PriceHigh = pairs[j].token1PriceHigh
             prevToken1PriceLow = pairs[j].token1PriceLow
-            prevVolumeToken1In = pairs[j].volumeToken1In
-            prevVolumeToken1Out = pairs[j].volumeToken1Out
   
             beginTimestamp += 86400
             endTimestamp += 86400
@@ -247,8 +245,8 @@ export async function getPairsDaysInfo(startTimestamp, endTime, token0, token1)
             token1PriceClose: prevToken1PriceClose,
             token1PriceHigh: prevToken1PriceHigh,
             token1PriceLow: prevToken1PriceLow,
-            volumeToken1In: prevVolumeToken1In,
-            volumeToken1Out: prevVolumeToken1Out,
+            volumeToken1In: 0,
+            volumeToken1Out: 0,
             }
         )
         beginTimestamp += 86400
@@ -369,8 +367,6 @@ export async function getPairsHoursInfo(startTimestamp, endTime, token0, token1)
         prevToken1PriceClose = pairs[j].token1PriceClose
         prevToken1PriceHigh = pairs[j].token1PriceHigh
         prevToken1PriceLow = pairs[j].token1PriceLow
-        prevVolumeToken1In = pairs[j].volumeToken1In
-        prevVolumeToken1Out = pairs[j].volumeToken1Out
 
         beginTimestamp += 3600
         endTimestamp += 3600
@@ -392,8 +388,8 @@ export async function getPairsHoursInfo(startTimestamp, endTime, token0, token1)
             token1PriceClose: prevToken1PriceClose,
             token1PriceHigh: prevToken1PriceHigh,
             token1PriceLow: prevToken1PriceLow,
-            volumeToken1In: prevVolumeToken1In,
-            volumeToken1Out: prevVolumeToken1Out,
+            volumeToken1In: 0,
+            volumeToken1Out: 0,
           }
           
           data.push(obj)
@@ -408,8 +404,6 @@ export async function getPairsHoursInfo(startTimestamp, endTime, token0, token1)
           prevToken1PriceClose = pairs[j].token1PriceClose
           prevToken1PriceHigh = pairs[j].token1PriceHigh
           prevToken1PriceLow = pairs[j].token1PriceLow
-          prevVolumeToken1In = pairs[j].volumeToken1In
-          prevVolumeToken1Out = pairs[j].volumeToken1Out
 
           let objTmp = {
             beginTimestamp: beginTimestamp,
@@ -440,8 +434,8 @@ export async function getPairsHoursInfo(startTimestamp, endTime, token0, token1)
           token1PriceClose: prevToken1PriceClose,
           token1PriceHigh: prevToken1PriceHigh,
           token1PriceLow: prevToken1PriceLow,
-          volumeToken1In: prevVolumeToken1In,
-          volumeToken1Out: prevVolumeToken1Out,
+          volumeToken1In: 0,
+          volumeToken1Out: 0,
       }
       )
       beginTimestamp += 3600
@@ -562,8 +556,8 @@ export async function getPairsNHoursInfo(startTimestamp, endTime, token0, token1
           obj.token1PriceClose += Number(pairs[j].token1PriceClose)
           obj.token1PriceHigh += Number(pairs[j].token1PriceHigh)
           obj.token1PriceLow += Number(pairs[j].token1PriceLow)
-          obj.volumeToken1In = Number(pairs[j].volumeToken1In)
-          obj.volumeToken1Out = Number(pairs[j].volumeToken1Out)
+          obj.volumeToken1In += Number(pairs[j].volumeToken1In)
+          obj.volumeToken1Out += Number(pairs[j].volumeToken1Out)
 
         }
       }
@@ -571,16 +565,12 @@ export async function getPairsNHoursInfo(startTimestamp, endTime, token0, token1
       prevToken1PriceClose = obj.token1PriceClose
       prevToken1PriceHigh = obj.token1PriceHigh
       prevToken1PriceLow = obj.token1PriceLow
-      prevVolumeToken1In = obj.volumeToken1In
-      prevVolumeToken1Out = obj.volumeToken1Out
       if(obj.token1PriceOpen == 0)
       {
         obj.token1PriceOpen += Number(prevToken1PriceOpen)
         obj.token1PriceClose += Number(prevToken1PriceClose)
         obj.token1PriceHigh += Number(prevToken1PriceHigh)
         obj.token1PriceLow += Number(prevToken1PriceLow)
-        obj.volumeToken1In = Number(prevVolumeToken1In)
-        obj.volumeToken1Out = Number(prevVolumeToken1Out)
       }
       data.push(obj)
     }
@@ -729,8 +719,8 @@ export async function getPairsMinuteInfo(startTimestamp, endTime, token0, token1
             token1PriceClose: prevToken1PriceClose,
             token1PriceHigh: prevToken1PriceHigh,
             token1PriceLow: prevToken1PriceLow,
-            volumeToken1In: prevVolumeToken1In,
-            volumeToken1Out: prevVolumeToken1Out,
+            volumeToken1In: 0,
+            volumeToken1Out: 0,
           }
           
           data.push(obj)
@@ -777,8 +767,8 @@ export async function getPairsMinuteInfo(startTimestamp, endTime, token0, token1
           token1PriceClose: prevToken1PriceClose,
           token1PriceHigh: prevToken1PriceHigh,
           token1PriceLow: prevToken1PriceLow,
-          volumeToken1In: prevVolumeToken1In,
-          volumeToken1Out: prevVolumeToken1Out,
+          volumeToken1In: 0,
+          volumeToken1Out: 0,
         }
       )
       beginTimestamp += 60
