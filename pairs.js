@@ -536,7 +536,6 @@ export async function getPairsNHoursInfo(startTimestamp, endTime, token0, token1
 
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + hours*3600; beginTimestamp < endTime; beginTimestamp += hours*3600, endTimestamp+=hours*3600)
     {
-      
       let obj = {
         beginTimestamp: beginTimestamp,
         endTimestamp: endTimestamp,
@@ -547,30 +546,46 @@ export async function getPairsNHoursInfo(startTimestamp, endTime, token0, token1
         volumeToken1In: 0,
         volumeToken1Out: 0,
       }
+      let isOpen = false
       for(let j = 0; j < pairs.length; ++j)
       {
         
         if(beginTimestamp <= pairs[j].timestamp && pairs[j].timestamp < endTimestamp)
         {
-          obj.token1PriceOpen += Number(pairs[j].token1PriceOpen)
-          obj.token1PriceClose += Number(pairs[j].token1PriceClose)
-          obj.token1PriceHigh += Number(pairs[j].token1PriceHigh)
-          obj.token1PriceLow += Number(pairs[j].token1PriceLow)
+
+          obj.token1PriceClose = Number(pairs[j].token1PriceClose)
+
+          if(!isOpen)
+          {
+            obj.token1PriceOpen = Number(pairs[j].token1PriceOpen)
+            obj.token1PriceLow = Number(pairs[j].token1PriceLow)
+            isOpen = true
+          }
+          
+          if(Number(pairs[j].token1PriceHigh) > obj.token1PriceHigh)
+          {
+            obj.token1PriceHigh = Number(pairs[j].token1PriceHigh)
+          }
+          if(Number(pairs[j].token1PriceLow) < obj.token1PriceLow)
+          {
+            obj.token1PriceLow = Number(pairs[j].token1PriceLow)
+          }
           obj.volumeToken1In += Number(pairs[j].volumeToken1In)
           obj.volumeToken1Out += Number(pairs[j].volumeToken1Out)
 
         }
       }
+      
       prevToken1PriceOpen = obj.token1PriceOpen
       prevToken1PriceClose = obj.token1PriceClose
       prevToken1PriceHigh = obj.token1PriceHigh
       prevToken1PriceLow = obj.token1PriceLow
       if(obj.token1PriceOpen == 0)
       {
-        obj.token1PriceOpen += Number(prevToken1PriceOpen)
-        obj.token1PriceClose += Number(prevToken1PriceClose)
-        obj.token1PriceHigh += Number(prevToken1PriceHigh)
-        obj.token1PriceLow += Number(prevToken1PriceLow)
+        obj.token1PriceOpen = Number(prevToken1PriceOpen)
+        obj.token1PriceClose = Number(prevToken1PriceClose)
+        obj.token1PriceHigh = Number(prevToken1PriceHigh)
+        obj.token1PriceLow = Number(prevToken1PriceLow)
       }
       data.push(obj)
     }
