@@ -519,22 +519,37 @@ export async function getPairsNHoursInfo(startTimestamp, endTime, token0, token1
         volumeToken1In: 0,
         volumeToken1Out:0,
       }
+      let isOpen = false
       for(let j = 0; j < pairs.length; ++j)
       {
         
         if(beginTimestamp <= pairs[j].timestamp && pairs[j].timestamp < endTimestamp)
         {
-          obj.token1PriceOpen += Number(pairs[j].token1PriceOpen)
-          obj.token1PriceClose += Number(pairs[j].token1PriceClose)
-          obj.token1PriceHigh += Number(pairs[j].token1PriceHigh)
-          obj.token1PriceLow += Number(pairs[j].token1PriceLow)
-          obj.volumeToken1In = Number(pairs[j].volumeToken1In)
+
+          obj.token1PriceClose = Number(pairs[j].token1PriceClose)
+
+          if(!isOpen)
+          {
+            obj.token1PriceOpen = Number(pairs[j].token1PriceOpen)
+            obj.token1PriceLow = Number(pairs[j].token1PriceLow)
+            isOpen = true
+          }
           
-          obj.volumeToken1Out = Number(pairs[j].volumeToken1Out)
-          
+          if(Number(pairs[j].token1PriceHigh) > obj.token1PriceHigh)
+          {
+            obj.token1PriceHigh = Number(pairs[j].token1PriceHigh)
+          }
+          if(Number(pairs[j].token1PriceLow) < obj.token1PriceLow)
+          {
+            obj.token1PriceLow = Number(pairs[j].token1PriceLow)
+          }
+          obj.volumeToken1In += Number(pairs[j].volumeToken1In)
+          obj.volumeToken1Out += Number(pairs[j].volumeToken1Out)
         }
       }
+      
       data.push(obj)
+    
     }
 
     return data;
