@@ -1,6 +1,6 @@
 # sushi-swap-ohm
-    This repository contains functions for sending requests to a custom Sushi Swap subgraph.
-    Functions for getting swaps info for 1 day/1 hour/n hours/1 minute interval presented in pairs.js
+This repository contains functions for sending requests to a custom Sushi Swap subgraph.
+Functions for getting swaps info for 1 day/1 hour/n hours/1 minute interval presented in pairs.js
 
 ## Install
 
