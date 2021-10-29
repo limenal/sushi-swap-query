@@ -11,8 +11,8 @@
     $ node index.js
 ## getPairsNHoursInfo() function
 
-    Note that functions for N minutes or N days can also be implemented. After fetching data we need to iterate all time intervals like that:
-    
+    Note that functions for N minutes or N days can also be implemented to create custom intervals such as 5m or 7d / 1w. After fetching data we need to iterate all time intervals like that: 
+       
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + N * timeInterval; beginTimestamp < endTime; beginTimestamp += N*timeInterval, endTimestamp+= N * timeInterval)
     {
       
