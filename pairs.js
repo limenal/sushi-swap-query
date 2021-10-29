@@ -1,80 +1,12 @@
 import axios from 'axios'
 
-
-export async function getSwaps(startTimestamp, period, numberOfPeriods)
-{
-  let timestamps = []
-  for(let i = 0; i < numberOfPeriods; ++i)
-  {
-    timestamps.push(startTimestamp + i*period)
-  }
-  let query = '{'
-
-  let data = []
-  for(let i = 0; i < timestamps.length - 1; ++i)
-  {
-    query += `
-      t${timestamps[i]}:pairs(first: 1, where:{timestamp_gte: ${timestamps[i]}, timestamp_lt: ${timestamps[i+1]}})
-      {
-        amountStaked
-        timestamp
-      }
-    
-      `
-    if(i % 220 == 0)
-    {
-      console.log(i)
-      // send query then null
-      query+= "}"
-      const stakeData = await axios({
-        url: 'https://api.thegraph.com/subgraphs/name/limenal/olympus-stake',
-        method: 'post',
-        data: {
-          query: query
-        }
-      })
-      let pairs = stakeData.data.data
-      // console.log(pairs)
-      // console.log(Date())
-      console.log(pairs)
-      data.concat(pairs)
-      query = '{'
-    }
-    // else
-    // {
-    //   query += `
-    //   t${timestamps[i]}:pairs(first: 1, where:{timestamp_gte: ${timestamps[i]}, timestamp_lt: ${timestamps[i+1]}})
-    //   {
-    //     amountStaked
-    //     timestamp
-    //   }
-    
-    //   `
-    // }
-  }
-  return data
-  // for(let i = 0; i < timestamps.length - 1; ++i)
-  // {
-  //   query += `
-  //     t${timestamps[i]}:swaps(first: 1, where:{token0:"SUSHI", token1:"WETH", timestamp_gte: ${timestamps[i]}, timestamp_lt: ${timestamps[i+1]}}, orderBy:price, orderDirection:desc)
-  //     {
-  //       price
-  //       amount0In
-  //       amount0Out
-  //     }
-    
-  //   `
-  // }
-  // query += '}'
-  // console.log(pairs)
-  
-}
-
-
-
 /**
 
     * @dev : Get pairs (days)
+    * @param startTimestamp - Start timestamp for query 
+    * @param endTime - End timestamp for query
+    * @param token0 - Token0 symbol e.g. OHM
+    * @param token1 - Token1 symbol e.g. DAI
 
 */
 export async function getPairsDaysInfo(startTimestamp, endTime, token0, token1)
@@ -246,7 +178,15 @@ export async function getPairsDaysInfo(startTimestamp, endTime, token0, token1)
         console.log(err)
     }
 }
+/**
 
+    * @dev : Get pairs (hours)
+    * @param startTimestamp - Start timestamp for query 
+    * @param endTime - End timestamp for query
+    * @param token0 - Token0 symbol e.g. OHM
+    * @param token1 - Token1 symbol e.g. DAI
+
+*/
 export async function getPairsHoursInfo(startTimestamp, endTime, token0, token1)
 {
   let findPairQuery = 
@@ -424,6 +364,16 @@ export async function getPairsHoursInfo(startTimestamp, endTime, token0, token1)
 
   }
 }
+/**
+
+    * @dev : Get pairs (N hours)
+    * @param startTimestamp - Start timestamp for query 
+    * @param endTime - End timestamp for query
+    * @param token0 - Token0 symbol e.g. OHM
+    * @param token1 - Token1 symbol e.g. DAI
+    * @param hours - Number of hours
+
+*/
 export async function getPairsNHoursInfo(startTimestamp, endTime, token0, token1, hours)
 {
   let findPairQuery = 
@@ -559,7 +509,15 @@ export async function getPairsNHoursInfo(startTimestamp, endTime, token0, token1
 
   }
 }
+/**
 
+    * @dev : Get pairs (minutes)
+    * @param startTimestamp - Start timestamp for query 
+    * @param endTime - End timestamp for query
+    * @param token0 - Token0 symbol e.g. OHM
+    * @param token1 - Token1 symbol e.g. DAI
+
+*/
 export async function getPairsMinuteInfo(startTimestamp, endTime, token0, token1)
 {
   let findPairQuery = 
