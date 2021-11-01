@@ -1,9 +1,9 @@
-import {getPairsDaysInfo, getPairsHoursInfo, getPairsMinuteInfo, getPairsNHoursInfo} from './pairs.js'
+import {getPairsDaysInfo, getPairsHoursInfo, getPairsMinuteInfo, getPairsNHoursInfo, getPairsNDaysInfo, getPairsNMinutesInfo} from './pairs.js'
 
 async function main()
 {
     // const pair = await getSwaps(1621390383, 60, 222)
-    let pair = await getPairsMinuteInfo(1634342400, 1634428800 , 'OHM', 'DAI')
+    let pair = await getPairsMinuteInfo(1635379200, 1635724800 , 'OHM', 'DAI')
     for(let i = 0; i < pair.length; ++i)
     {
         console.log(pair[i])
