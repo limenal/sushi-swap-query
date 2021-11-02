@@ -269,7 +269,7 @@ export async function getPairsNDaysInfo(startTimestamp, endTime, token0, token1,
         
       }
     }
-    let prevToken1PriceOpen, prevToken1PriceClose, prevToken1PriceHigh, prevToken1PriceLow, prevVolumeToken1In, prevVolumeToken1Out =
+    let [prevToken1PriceOpen, prevToken1PriceClose, prevToken1PriceHigh, prevToken1PriceLow, prevVolumeToken1In, prevVolumeToken1Out] =
     [0, 0, 0, 0, 0, 0]
 
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + days*86400; beginTimestamp < endTime; beginTimestamp += days*86400, endTimestamp += days*86400)
@@ -603,7 +603,7 @@ export async function getPairsNHoursInfo(startTimestamp, endTime, token0, token1
         }
       }
     }
-    let prevToken1PriceOpen, prevToken1PriceClose, prevToken1PriceHigh, prevToken1PriceLow, prevVolumeToken1In, prevVolumeToken1Out =
+    let [prevToken1PriceOpen, prevToken1PriceClose, prevToken1PriceHigh, prevToken1PriceLow, prevVolumeToken1In, prevVolumeToken1Out] =
     [0, 0, 0, 0, 0, 0]
 
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + hours*3600; beginTimestamp < endTime; beginTimestamp += hours*3600, endTimestamp+=hours*3600)
@@ -763,7 +763,7 @@ export async function getPairsMinuteInfo(startTimestamp, endTime, token0, token1
     let beginTimestamp = startTimestamp
     let endTimestamp = startTimestamp + 60
     let startIndexingTimestamp = 0
-    let prevToken1PriceOpen, prevToken1PriceClose, prevToken1PriceHigh, prevToken1PriceLow, prevVolumeToken1In, prevVolumeToken1Out =
+    let [prevToken1PriceOpen, prevToken1PriceClose, prevToken1PriceHigh, prevToken1PriceLow, prevVolumeToken1In, prevVolumeToken1Out] =
     [0, 0, 0, 0, 0, 0]
     for(let j = 0; j < pairs.length; ++j)
     {
@@ -959,8 +959,9 @@ export async function getPairsNMinutesInfo(startTimestamp, endTime, token0, toke
         }
       }
     }
-    let prevToken1PriceOpen, prevToken1PriceClose, prevToken1PriceHigh, prevToken1PriceLow, prevVolumeToken1In, prevVolumeToken1Out =
-    [0, 0, 0, 0, 0, 0]
+    // let prevToken1PriceOpen = 0, prevToken1PriceClose = 0
+    let [prevToken1PriceOpen, prevToken1PriceClose] =
+    [0, 0]
     for(let beginTimestamp = startTimestamp, endTimestamp = startTimestamp + minutes*60; beginTimestamp < endTime; beginTimestamp += minutes*60, endTimestamp += minutes*60)
     {
       
@@ -980,7 +981,7 @@ export async function getPairsNMinutesInfo(startTimestamp, endTime, token0, toke
         
         if(beginTimestamp <= pairs[j].timestamp && pairs[j].timestamp < endTimestamp)
         {
-
+          
           obj.token1PriceClose = Number(pairs[j].token1PriceClose)
           prevToken1PriceClose = Number(pairs[j].token1PriceClose)
           if(!isOpen)

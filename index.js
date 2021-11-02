@@ -3,10 +3,14 @@ import {getPairsDaysInfo, getPairsHoursInfo, getPairsMinuteInfo, getPairsNHoursI
 async function main()
 {
     // const pair = await getSwaps(1621390383, 60, 222)
-    let pair = await getPairsMinuteInfo(1635379200, 1635724800 , 'OHM', 'DAI')
+    let pair = await getPairsNMinutesInfo(1635724800, 1635897600 , 'OHM', 'DAI', 1)
     for(let i = 0; i < pair.length; ++i)
     {
-        console.log(pair[i])
+        if(pair[i].token1PriceOpen == undefined)
+        {
+            console.log(pair[i])
+
+        }
     }
     // console.log(pair[pair.length - 1])
     console.log(pair.length)
