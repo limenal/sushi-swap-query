@@ -9,7 +9,7 @@ import axios from 'axios'
     * @param token1 - Token1 symbol e.g. DAI
 
 */
-export async function getPairsDaysInfo(startTimestamp, endTime, token0, token1)
+export async function getPairsInfoDays(startTimestamp, endTime, token0, token1)
 {
   let findPairQuery = 
   `{
@@ -68,6 +68,8 @@ export async function getPairsDaysInfo(startTimestamp, endTime, token0, token1)
       const pair = pairData.data.data.pairYears
       let data = []
       let pairs = []
+      let [prevToken1PriceOpen, prevToken1PriceClose] = [0, 0]
+
       for(let c = 0; c < pair.length; ++c)
       {
         for(let i = 0; i < pair[c].dayPair.length; ++i)
@@ -102,7 +104,9 @@ export async function getPairsDaysInfo(startTimestamp, endTime, token0, token1)
             volumeToken1Out: pairs[j].volumeToken1Out,
             timestamp: pairs[j].timestamp
           }
-          
+          prevToken1PriceOpen = pairs[j].token1PriceOpen
+          prevToken1PriceClose = pairs[j].token1PriceClose
+
           beginTimestamp += 86400
           endTimestamp += 86400
         
@@ -119,10 +123,10 @@ export async function getPairsDaysInfo(startTimestamp, endTime, token0, token1)
             let obj = {
               beginTimestamp: beginTimestamp,
               endTimestamp: endTimestamp,
-              token1PriceOpen: 0,
-              token1PriceClose: 0,
-              token1PriceHigh: 0,
-              token1PriceLow: 0,
+              token1PriceOpen: prevToken1PriceClose,
+              token1PriceClose: prevToken1PriceClose,
+              token1PriceHigh: prevToken1PriceClose,
+              token1PriceLow: prevToken1PriceClose,
               volumeToken1In: 0,
               volumeToken1Out:0,
             }
@@ -146,6 +150,9 @@ export async function getPairsDaysInfo(startTimestamp, endTime, token0, token1)
               volumeToken1Out: pairs[j].volumeToken1Out,
               timestamp: pairs[j].timestamp
             }
+            prevToken1PriceOpen = pairs[j].token1PriceOpen
+            prevToken1PriceClose = pairs[j].token1PriceClose
+  
             beginTimestamp += 86400
             endTimestamp += 86400
             
@@ -160,10 +167,10 @@ export async function getPairsDaysInfo(startTimestamp, endTime, token0, token1)
           {
             beginTimestamp: beginTimestamp,
             endTimestamp: endTimestamp,
-            token1PriceOpen: 0,
-            token1PriceClose: 0,
-            token1PriceHigh: 0,
-            token1PriceLow: 0,
+            token1PriceOpen: prevToken1PriceClose,
+            token1PriceClose: prevToken1PriceClose,
+            token1PriceHigh: prevToken1PriceClose,
+            token1PriceLow: prevToken1PriceClose,
             volumeToken1In: 0,
             volumeToken1Out:0,
           }
@@ -189,7 +196,7 @@ export async function getPairsDaysInfo(startTimestamp, endTime, token0, token1)
     * @param days - Number of days
 
 */
-export async function getPairsNDaysInfo(startTimestamp, endTime, token0, token1, days)
+export async function getPairsInfoNDays(startTimestamp, endTime, token0, token1, days)
 {
   let findPairQuery = 
   `{
@@ -278,10 +285,10 @@ export async function getPairsNDaysInfo(startTimestamp, endTime, token0, token1,
       let obj = {
         beginTimestamp: beginTimestamp,
         endTimestamp: endTimestamp,
-        token1PriceOpen: prevToken1PriceOpen,
+        token1PriceOpen: prevToken1PriceClose,
         token1PriceClose: prevToken1PriceClose,
-        token1PriceHigh: 0,
-        token1PriceLow: 0,
+        token1PriceHigh: prevToken1PriceClose,
+        token1PriceLow: prevToken1PriceClose,
         volumeToken1In: 0,
         volumeToken1Out:0,
       }
@@ -334,7 +341,7 @@ export async function getPairsNDaysInfo(startTimestamp, endTime, token0, token1,
     * @param token1 - Token1 symbol e.g. DAI
 
 */
-export async function getPairsHoursInfo(startTimestamp, endTime, token0, token1)
+export async function getPairsInfoHours(startTimestamp, endTime, token0, token1)
 {
   let findPairQuery = 
   `{
@@ -419,6 +426,9 @@ export async function getPairsHoursInfo(startTimestamp, endTime, token0, token1)
     let beginTimestamp = startTimestamp
     let endTimestamp = startTimestamp + 3600
     let startIndexingTimestamp = 0
+    let [prevToken1PriceOpen, prevToken1PriceClose, prevToken1PriceHigh, prevToken1PriceLow, prevVolumeToken1In, prevVolumeToken1Out] =
+    [0, 0, 0, 0, 0, 0]
+
     for(let j = 0; j < pairs.length; ++j)
     {
       if(beginTimestamp <= Number(pairs[j].timestamp) && Number(pairs[j].timestamp) < endTimestamp)
@@ -434,7 +444,9 @@ export async function getPairsHoursInfo(startTimestamp, endTime, token0, token1)
           volumeToken1Out: pairs[j].volumeToken1Out,
           timestamp: pairs[j].timestamp
         }
-        
+        prevToken1PriceOpen = pairs[j].token1PriceOpen
+        prevToken1PriceClose = pairs[j].token1PriceClose
+
         beginTimestamp += 3600
         endTimestamp += 3600
 
@@ -451,10 +463,10 @@ export async function getPairsHoursInfo(startTimestamp, endTime, token0, token1)
           let obj = {
             beginTimestamp: beginTimestamp,
             endTimestamp: endTimestamp,
-            token1PriceOpen: 0,
-            token1PriceClose: 0,
-            token1PriceHigh: 0,
-            token1PriceLow: 0,
+            token1PriceOpen: prevToken1PriceClose,
+            token1PriceClose: prevToken1PriceClose,
+            token1PriceHigh: prevToken1PriceClose,
+            token1PriceLow: prevToken1PriceClose,
             volumeToken1In: 0,
             volumeToken1Out:0,
           }
@@ -478,6 +490,9 @@ export async function getPairsHoursInfo(startTimestamp, endTime, token0, token1)
             volumeToken1Out: pairs[j].volumeToken1Out,
             timestamp: pairs[j].timestamp
           }
+          prevToken1PriceOpen = pairs[j].token1PriceOpen
+          prevToken1PriceClose = pairs[j].token1PriceClose
+
           beginTimestamp += 3600
           endTimestamp += 3600
           
@@ -492,10 +507,10 @@ export async function getPairsHoursInfo(startTimestamp, endTime, token0, token1)
         {
           beginTimestamp: beginTimestamp,
           endTimestamp: endTimestamp,
-          token1PriceOpen: 0,
-          token1PriceClose: 0,
-          token1PriceHigh: 0,
-          token1PriceLow: 0,
+          token1PriceOpen: prevToken1PriceClose,
+          token1PriceClose: prevToken1PriceClose,
+          token1PriceHigh: prevToken1PriceClose,
+          token1PriceLow: prevToken1PriceClose,
           volumeToken1In: 0,
           volumeToken1Out:0,
         }
@@ -521,7 +536,7 @@ export async function getPairsHoursInfo(startTimestamp, endTime, token0, token1)
     * @param hours - Number of hours
 
 */
-export async function getPairsNHoursInfo(startTimestamp, endTime, token0, token1, hours)
+export async function getPairsInfoNHours(startTimestamp, endTime, token0, token1, hours)
 {
   let findPairQuery = 
   `{
@@ -612,10 +627,10 @@ export async function getPairsNHoursInfo(startTimestamp, endTime, token0, token1
       let obj = {
         beginTimestamp: beginTimestamp,
         endTimestamp: endTimestamp,
-        token1PriceOpen: prevToken1PriceOpen,
+        token1PriceOpen: prevToken1PriceClose,
         token1PriceClose: prevToken1PriceClose,
-        token1PriceHigh: 0,
-        token1PriceLow: 0,
+        token1PriceHigh: prevToken1PriceClose,
+        token1PriceLow: prevToken1PriceClose,
         volumeToken1In: 0,
         volumeToken1Out:0,
       }
@@ -670,7 +685,7 @@ export async function getPairsNHoursInfo(startTimestamp, endTime, token0, token1
     * @param token1 - Token1 symbol e.g. DAI
 
 */
-export async function getPairsMinuteInfo(startTimestamp, endTime, token0, token1)
+export async function getPairsInfoMinutes(startTimestamp, endTime, token0, token1)
 {
   let findPairQuery = 
   `{
@@ -781,7 +796,7 @@ export async function getPairsMinuteInfo(startTimestamp, endTime, token0, token1
           timestamp: pairs[j].timestamp
         }
         prevToken1PriceOpen = pairs[j].token1PriceOpen
-          prevToken1PriceClose = pairs[j].token1PriceClose
+        prevToken1PriceClose = pairs[j].token1PriceClose
         beginTimestamp += 60
         endTimestamp += 60
 
@@ -798,10 +813,10 @@ export async function getPairsMinuteInfo(startTimestamp, endTime, token0, token1
           let obj = {
             beginTimestamp: beginTimestamp,
             endTimestamp: endTimestamp,
-            token1PriceOpen: prevToken1PriceOpen,
+            token1PriceOpen: prevToken1PriceClose,
             token1PriceClose: prevToken1PriceClose,
-            token1PriceHigh: 0,
-            token1PriceLow: 0,
+            token1PriceHigh: prevToken1PriceClose,
+            token1PriceLow: prevToken1PriceClose,
             volumeToken1In: 0,
             volumeToken1Out: 0,
           }
@@ -842,10 +857,10 @@ export async function getPairsMinuteInfo(startTimestamp, endTime, token0, token1
         {
           beginTimestamp: beginTimestamp,
           endTimestamp: endTimestamp,
-          token1PriceOpen: prevToken1PriceOpen,
+          token1PriceOpen: prevToken1PriceClose,
           token1PriceClose: prevToken1PriceClose,
-          token1PriceHigh: 0,
-          token1PriceLow: 0,
+          token1PriceHigh: prevToken1PriceClose,
+          token1PriceLow: prevToken1PriceClose,
           volumeToken1In: 0,
           volumeToken1Out:0,
         }
@@ -871,7 +886,7 @@ export async function getPairsMinuteInfo(startTimestamp, endTime, token0, token1
     * @param minutes - Number of minutes
 
 */
-export async function getPairsNMinutesInfo(startTimestamp, endTime, token0, token1, minutes)
+export async function getPairsInfoNMinutes(startTimestamp, endTime, token0, token1, minutes)
 {
   let findPairQuery = 
   `{
@@ -968,10 +983,10 @@ export async function getPairsNMinutesInfo(startTimestamp, endTime, token0, toke
       let obj = {
         beginTimestamp: beginTimestamp,
         endTimestamp: endTimestamp,
-        token1PriceOpen: prevToken1PriceOpen,
+        token1PriceOpen: prevToken1PriceClose,
         token1PriceClose: prevToken1PriceClose,
-        token1PriceHigh: 0,
-        token1PriceLow: 0,
+        token1PriceHigh: prevToken1PriceClose,
+        token1PriceLow: prevToken1PriceClose,
         volumeToken1In: 0,
         volumeToken1Out:0,
       }
